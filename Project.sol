@@ -81,12 +81,30 @@ contract TTTGame {
         if ((gameState[2] == val) && (gameState[4] == val) && (gameState[6] == val)){
             _endGame(_win);
         }
+        uint place = 100; 
+        for(uint i = 0; i < 9; i++){
+            if (gameState[i] == 0) {
+                place = i;
+                break;
+            }
+        }
+        if (place == 100) {
+            _endGameDraw();
+        }
     }
 
-    function _endGame(address _winner)internal {
+    function _endGame(address _winner) internal {
         gameEnded = true;
         bool sent = payable(_winner).send(1 ether);
         require(sent, "Failed to send Ether");
+    }
+
+    function _endGameDraw() internal {
+        gameEnded = true;
+        bool sent = payable(p1).send(0.5 ether);
+        require(sent, "Failed to send Ether");
+        bool sent2 = payable(p2).send(0.5 ether);
+        require(sent2, "Failed to send Ether");
     }
 
     receive() external payable {

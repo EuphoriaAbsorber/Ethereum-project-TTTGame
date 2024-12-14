@@ -4,7 +4,7 @@ pragma solidity ^0.8.26;
 contract TTTGame {
     address payable public p1;
     address payable public p2;
-    uint256 public dep = 0.5 ether;
+    uint256 public dep = 0.00005 ether;
     uint[] public gameState;
     bool public turn; // 0 -- p1, 1 -- p2
     bool public gameEnded;
@@ -22,7 +22,7 @@ contract TTTGame {
     function makeTurn(uint[9] memory _turn) external {
         require(!gameEnded, "game has ended");
         if(msg.sender == p1) {
-            require(balanceOf[p1] == 0.5 ether, "no deposit");
+            require(balanceOf[p1] == dep, "no deposit");
             require(!turn, "not your turn");
             uint place = 0; 
             for(uint i = 0; i < 9; i++){
@@ -37,7 +37,7 @@ contract TTTGame {
             _checkWin(p1, 1);
         }
         if(msg.sender == p2) {
-            require(balanceOf[p2] == 0.5 ether, "no deposit");
+            require(balanceOf[p2] == dep, "no deposit");
             require(turn, "not your turn");
             uint place = 0; 
             for(uint i = 0; i < 9; i++){
@@ -95,23 +95,23 @@ contract TTTGame {
 
     function _endGame(address _winner) internal {
         gameEnded = true;
-        bool sent = payable(_winner).send(1 ether);
+        bool sent = payable(_winner).send(dep * 2);
         require(sent, "Failed to send Ether");
     }
 
     function _endGameDraw() internal {
         gameEnded = true;
-        bool sent = payable(p1).send(0.5 ether);
+        bool sent = payable(p1).send(dep);
         require(sent, "Failed to send Ether");
-        bool sent2 = payable(p2).send(0.5 ether);
+        bool sent2 = payable(p2).send(dep);
         require(sent2, "Failed to send Ether");
     }
 
     receive() external payable {
         balanceOf[msg.sender] += msg.value;
-        if (balanceOf[msg.sender] > 0.5 ether){
-            uint256 amount = balanceOf[msg.sender] - 0.5 ether;
-            balanceOf[msg.sender] = 0.5 ether;
+        if (balanceOf[msg.sender] > dep){
+            uint256 amount = balanceOf[msg.sender] - dep;
+            balanceOf[msg.sender] = dep;
             bool sent = payable(msg.sender).send(amount);
             require(sent, "Failed to send Ether");
         }
